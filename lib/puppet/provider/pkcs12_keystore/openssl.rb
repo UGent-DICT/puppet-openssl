@@ -2,6 +2,7 @@
 
 require 'openssl'
 require 'puppet/file_system'
+require 'tempfile'
 
 Puppet::Type.type(:pkcs12_keystore).provide(:openssl) do
   desc 'Manage a pkcs12 keystore with OpenSSL Ruby bindings.'
@@ -38,7 +39,7 @@ Puppet::Type.type(:pkcs12_keystore).provide(:openssl) do
 
     Puppet::FileSystem.replace_file(resource[:path]) do |file|
       # Not using OpenSSL::PKCS12.create here because system openssl and puppet openssl can differ..
-      in_tempfile = Puppet::FileSystem::Uniquefile.new(Puppet::FileSystem.basename_string(resource[:path]), Puppet::FileSystem.dir_string(resource[:path]), mode: File::APPEND)
+      in_tempfile = Tempfile.new(Puppet::FileSystem.basename_string(resource[:path]), Puppet::FileSystem.dir_string(resource[:path]), mode: File::APPEND)
 
       begin
         exec = [
